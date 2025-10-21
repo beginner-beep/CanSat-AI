@@ -25,7 +25,7 @@ cv2.setTrackbarPos('VMax', 'image', 255)
 hMin = sMin = vMin = hMax = sMax = vMax = 0
 phMin = psMin = pvMin = phMax = psMax = pvMax = 0
 
-img = cv2.imread('TestImages/Screenshot 2025-10-11 093736.png')
+img = cv2.imread('TestImages/Screenshot 2025-10-12 204328.png')
 output = img
 waitTime = 33
 

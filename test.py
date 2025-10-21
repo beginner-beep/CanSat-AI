@@ -10,15 +10,16 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-images = load_images_from_folder("TestImages")
-resImages = []
-for image in images:
-    resImages.append(image[0:1400, 0:1900])
-    cv2.imshow("Main", image)
-    cv2.waitKey()
-images = resImages
 
-lower_green = np.array([0,0, 150])
+images = load_images_from_folder("TestImages")
+
+for i, image in enumerate(images):
+    images[i] = (image[0:1400, 0:1900])
+  #  cv2.imshow("Main", image)
+   # cv2.waitKey()
+
+##colour filters: select values with colour picker script
+lower_green = np.array([0,0, 99])
 upper_green = np.array([255, 255, 255])
 ##(hMin = 112 , sMin = 0, vMin = 0), (hMax = 179 , sMax = 255, vMax = 255)
 lower_purple = np.array([113,0, 0])
@@ -26,27 +27,50 @@ upper_purple = np.array([179, 255, 255])
 
 resultForDisplay = []
 displayDifference = []
+contours = []
 for image in images:
-    
     hsvImage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
     greenmask = cv2.inRange(hsvImage, lower_green, upper_green)
     purplemask =cv2.inRange(hsvImage, lower_purple, upper_purple)
+
     resgreen = cv2.bitwise_and(image, image, mask=greenmask)
     respurple = cv2.bitwise_and(image, image, mask=purplemask)
+
     finalRes = cv2.bitwise_or(resgreen,respurple)
-
-    kernel = np.ones((5,5),np.uint8)
-    erosion = cv2.erode(finalRes,kernel,iterations = 1)
-
+    finalRes = cv2.cvtColor(finalRes,cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((2,2),np.uint8)
+    erosion = cv2.erode(finalRes,kernel,iterations = 9)
+    cv2.imshow("Erosion", erosion)
+    
+    cv2.waitKey()
+    
     displayDifference.extend([image,resgreen,respurple,finalRes,erosion])
+    
+    #gray_image = cv2.cvtColor(erosion, cv2.COLOR_BGR2GRAY)
+    ret,thresh = cv2.threshold(erosion, 10,10,10, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+   # cv2.imshow("Main", resgreen)
    
-    cv2.imshow("Main", resgreen)
-   ## cv2.waitKey()
-    cv2.imshow("Main", respurple)
-    ##cv2.waitKey()
-    cv2.imshow("Main", finalRes)
-    ##cv2.waitKey()
-    cv2.imshow("Main" ,erosion)
+    image_copy = thresh.copy()
+    
+    cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
+   # cv2.imshow("Main", finalRes)
+    scale = 0.3
+ 
+    img1_small = cv2.resize(erosion, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+    img3_small = cv2.resize(image_copy, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+  
+    
+# Combine side by side
+    comparisonErosion = cv2.hconcat([img1_small, img3_small])
+   
+    cv2.imshow("Comparison", comparisonErosion)
+# Show            
+# see the results
+  
+    cv2.imshow('contours_none_image1.jpg', image_copy)
+
     cv2.waitKey()
     resultForDisplay.append(finalRes)
 
@@ -55,12 +79,10 @@ new_width= 300
 new_height = 300
 for i, image in enumerate(displayDifference):
     displayDifference[i] = cv2.resize(image, (new_width, new_height))
-imdif = np.concatenate((displayDifference[0],displayDifference[1],displayDifference[2],displayDifference[3],displayDifference[4]), axis = 1)
 
-imdif1 = np.concatenate((displayDifference[5],displayDifference[6],displayDifference[7],displayDifference[8],displayDifference[9]), axis = 1)
-
-cv2.imshow("window1",imdif)
-cv2.imshow("window2",imdif1)
+for i, step in enumerate(displayDifference):
+    cv2.imshow("window", np.concatenate((displayDifference[0+i*5],displayDifference[1+ i *5],displayDifference[2+i*5],displayDifference[3+ i*5],displayDifference[4+i*5]), axis = 1))
+    cv2.waitKey()
 cv2.waitKey()
 
 """cv2.namedWindow("Resized_Window", cv2.WINDOW_NORMAL)
