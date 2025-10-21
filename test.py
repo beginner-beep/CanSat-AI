@@ -15,8 +15,6 @@ images = load_images_from_folder("TestImages")
 
 for i, image in enumerate(images):
     images[i] = (image[0:1400, 0:1900])
-  #  cv2.imshow("Main", image)
-   # cv2.waitKey()
 
 ##colour filters: select values with colour picker script
 lower_green = np.array([0,0, 99])
@@ -40,15 +38,18 @@ for image in images:
     finalRes = cv2.bitwise_or(resgreen,respurple)
     finalRes = cv2.cvtColor(finalRes,cv2.COLOR_BGR2GRAY)
     kernel = np.ones((2,2),np.uint8)
-    erosion = cv2.erode(finalRes,kernel,iterations = 9)
-    cv2.imshow("Erosion", erosion)
+    erosion = cv2.erode(finalRes,kernel,iterations = 5)
+    kernelClosing = np.ones((8,8), np.uint8)
+  
+    #erosion = cv2.morphologyEx(erosion, cv2.MORPH_OPEN, kernelClosing, iterations=1)   
+   # cv2.imshow("Erosion", erosion)
     
-    cv2.waitKey()
+    #cv2.waitKey()
     
     displayDifference.extend([image,resgreen,respurple,finalRes,erosion])
     
-    #gray_image = cv2.cvtColor(erosion, cv2.COLOR_BGR2GRAY)
     ret,thresh = cv2.threshold(erosion, 10,10,10, cv2.THRESH_BINARY)
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernelClosing, iterations=3)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
    # cv2.imshow("Main", resgreen)
    
@@ -56,20 +57,18 @@ for image in images:
     
     cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
    # cv2.imshow("Main", finalRes)
-    scale = 0.3
- 
+    scale = 0.2
+  
     img1_small = cv2.resize(erosion, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     img3_small = cv2.resize(image_copy, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-  
+    finalRes = cv2.resize(finalRes, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     
 # Combine side by side
-    comparisonErosion = cv2.hconcat([img1_small, img3_small])
+    comparisonErosion = cv2.hconcat([finalRes, img1_small, img3_small])
    
     cv2.imshow("Comparison", comparisonErosion)
-# Show            
-# see the results
-  
-    cv2.imshow('contours_none_image1.jpg', image_copy)
+
+  #  cv2.imshow('contours_none_image1.jpg', image_copy)
 
     cv2.waitKey()
     resultForDisplay.append(finalRes)
