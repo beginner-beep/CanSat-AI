@@ -1,0 +1,10 @@
+notes:
+purple filters(soft landing?)
+(hMin = 0 , sMin = 0, vMin = 0), (hMax = 113 , sMax = 255, vMax = 255)
+(hMin = 112 , sMin = 0, vMin = 0), (hMax = 179 , sMax = 255, vMax = 255)
+
+Thoughts:
+binarize (suggestion)
+expermiment with colour thresholds
+experiment with kernels, iterations and blurs
+benchmark performance tests
