@@ -1,18 +1,23 @@
 import multiprocessing as mp
 from multiprocessing import Queue,ProcessError
+import queue
 import time
 import threading
 from gpsthread import gpsthread
 from bmethread import bmethread
+from antennathread import antennathread
+
+from antennaqueue import q
 
 def manager(name):
     print("[name] Starting")
-
+	
     stop_event = threading.Event()
 
     threads = [
         threading.Thread(target=gpsthread, args=(stop_event,), daemon=True),
         threading.Thread(target=bmethread, args=(stop_event,), daemon=True),
+        threading.Thread(target=antennathread, args=(stop_event,), daemon=True)
     ]
 
     for t in threads:

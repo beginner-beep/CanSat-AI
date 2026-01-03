@@ -1,9 +1,11 @@
+import smbus2
+import bme280
+import time
+import matplotlib.pyplot as plt
+from datetime import datetime
+from antennaqueue import q
 def bmethread(name):
-    import smbus2
-    import bme280
-    import time
-    import matplotlib.pyplot as plt
-    from datetime import datetime
+    
 
     address = 0x76
 
@@ -18,10 +20,11 @@ def bmethread(name):
         humidity = data.humidity
         pressure = data.pressure
         timestamp = data.timestamp
-        print(f"Temperature:{temperature_celsius} celsius")
-        print(f"humidity:{humidity}")
-        print(f"pressure:{pressure}")
-        print(f"timestamp:{timestamp}")
-        print('-----------------')
+        q.put(f"Temperature{temperature_celsius}, humidity{humidity},pressure{pressure},time: {timestamp}")
+     #   print(f"Temperature:{temperature_celsius} celsius")
+      #  print(f"humidity:{humidity}")
+       # print(f"pressure:{pressure}")
+       # print(f"timestamp:{timestamp}")
+       # print('-----------------')
         time.sleep(1)
 
