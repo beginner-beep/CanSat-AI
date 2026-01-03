@@ -3,6 +3,7 @@ from multiprocessing import Queue,ProcessError
 import time
 import threading
 from gpsthread import gpsthread
+from bmethread import bmethread
 
 def manager(name):
     print("[name] Starting")
@@ -11,7 +12,7 @@ def manager(name):
 
     threads = [
         threading.Thread(target=gpsthread, args=(stop_event,), daemon=True),
-        #threading.Thread(target=thread_b, args=(stop_event,), daemon=True),
+        threading.Thread(target=bmethread, args=(stop_event,), daemon=True),
     ]
 
     for t in threads:

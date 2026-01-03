@@ -1,8 +1,8 @@
-import serial
-import time 
-import string
-import pynmea2
 def gpsthread():
+    import serial
+    import time 
+    import string
+    import pynmea2
     ser=serial.Serial("/dev/ttyAMA3", baudrate=38400, timeout=1)
     while True:
 
