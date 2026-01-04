@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from multiprocessing import Queue,ProcessError
+from multiprocessing import Queue,ProcessError, Pipe
 import queue
 import time
 import threading
@@ -7,8 +7,9 @@ from gpsthread import gpsthread
 from bmethread import bmethread
 from antennathread import antennathread
 from antennaqueue import q
-
-def manager(name):
+from computervisionthread import ComputerVision
+from processqueue import mpq 
+def manager(name,mpq):
     print("[name] Starting")
 	
     stop_event = threading.Event()
@@ -16,7 +17,7 @@ def manager(name):
     threads = [
         threading.Thread(target=gpsthread, args=(stop_event,), daemon=True),
         threading.Thread(target=bmethread, args=(stop_event,), daemon=True),
-        threading.Thread(target=antennathread, args=(stop_event,), daemon=True)
+        threading.Thread(target=antennathread, args=(stop_event, mpq), daemon=True)
     ]
 
     for t in threads:
@@ -30,9 +31,8 @@ def manager(name):
         stop_event.set()
 def main():
     print("Starting")
-
-    computer_vision_process= mp.Process(target=computerVision, args=("computer vision",))
-    data_process = mp.Process(target=manager, args=("other",))
+    computer_vision_process= mp.Process(target=ComputerVision, args=("computer vision", mpq))
+    data_process = mp.Process(target=manager, args=("other", mpq))
 
     computer_vision_process.start()
     data_process.start()
@@ -41,5 +41,5 @@ def main():
     data_process.join()
     
 if __name__ == "__main__":
-    mp.set_start_method("spawn")  # REQUIRED on Raspberry Pi
+   # mp.set_start_method("spawn")  # REQUIRED on Raspberry Pi
     main()

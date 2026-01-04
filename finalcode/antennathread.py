@@ -3,7 +3,7 @@ import time
 from gpiozero import DigitalOutputDevice
 from antennaqueue import q
 
-def antennathread(name):
+def antennathread(name,mpq):
 	
 	pin1 = DigitalOutputDevice(18)
 	pin2 = DigitalOutputDevice(23)
@@ -15,7 +15,7 @@ def antennathread(name):
 	
 	while True:
 		number +=1
-		msg = q.get()
+		msg = f"data queue {q.get()}, mp queue: {mpq.get()} "
 		ser.write(msg.encode())
 		print(msg, end=' ')
 		time.sleep(1)
