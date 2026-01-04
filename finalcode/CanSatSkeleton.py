@@ -6,7 +6,6 @@ import threading
 from gpsthread import gpsthread
 from bmethread import bmethread
 from antennathread import antennathread
-
 from antennaqueue import q
 
 def manager(name):
@@ -32,18 +31,15 @@ def manager(name):
 def main():
     print("Starting")
 
-  #  computer_vision_process= mp.Process(target=computerVision, args=("computer vision",))
+    computer_vision_process= mp.Process(target=computerVision, args=("computer vision",))
     data_process = mp.Process(target=manager, args=("other",))
 
-   # computer_vision_process.start()
+    computer_vision_process.start()
     data_process.start()
 
-    #computer_vision_process.join()
+    computer_vision_process.join()
     data_process.join()
     
-    
-    
-
 if __name__ == "__main__":
     mp.set_start_method("spawn")  # REQUIRED on Raspberry Pi
     main()
