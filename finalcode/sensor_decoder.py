@@ -39,9 +39,12 @@ class SensorDecoder:
                 return SensorDecoder._decode_bme(data_str)
             elif message_type == 'G':
                 return SensorDecoder._decode_gps(data_str)
+            elif message_type == 'C':
+                return SensorDecoder._decode_contour(data_str)
             else:
                 print(f"Unknown message type: {message_type}")
                 return None
+            
         except Exception as e:
             print(f"Error decoding message '{message}': {e}")
             return None
@@ -67,7 +70,27 @@ class SensorDecoder:
             'datetime': datetime.fromtimestamp(unix_timestamp).isoformat(),
             'raw': f"Temp: {temperature}°C, Humidity: {humidity}%, Pressure: {pressure} hPa"
         }
-    
+    @staticmethod
+    def _decode_contour(data_str):
+        """
+        Example contour message:
+        C:13,1063,62,921,24,601,210
+        """
+        parts = data_str.split(',')
+
+        count = int(parts[0])
+        coords = list(map(int, parts[1:]))
+
+        points = []
+        for i in range(0, len(coords), 2):
+           points.append((coords[i], coords[i+1]))
+
+        return {
+        'type': 'CONTOUR',
+        'count': count,
+        'points': points
+        }
+
     @staticmethod
     def _decode_gps(data_str):
         """Decode GPS (latitude, longitude, altitude) data"""
@@ -110,6 +133,9 @@ def format_data(decoded_data):
                 f"Lat={decoded_data['latitude']}°, "
                 f"Lon={decoded_data['longitude']}°, "
                 f"Alt={decoded_data['altitude_m']}m")
+    elif msg_type == 'CONTOUR':
+     return f"[CONTOUR] {decoded_data['count']} points"
+
     
     return "Unknown data type"
 

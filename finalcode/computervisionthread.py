@@ -47,7 +47,10 @@ def ComputerVision(name,mpq):
 		filtered_contours = sorted(filtered_contours, key=cv2.contourArea, reverse=True)
 		image_copy = thresh.copy()
 	# Keep only the largest N zones (e.g., 3)
-		contours = filtered_contours[:3]
+	#keeping one for transmitting now
+		contours = filtered_contours[:1]
+		epsilon = 0.01 * cv2.arcLength(contours[0], True)  # tuning parameter
+		approx = cv2.approxPolyDP(contours[0], epsilon, True)
 		
 		cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
 		
@@ -55,7 +58,7 @@ def ComputerVision(name,mpq):
 		#cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
 		image_copy = cv2.resize(image_copy, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
 		image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-		return image, image_copy
+		return image, image_copy, approx
 		
 	   
 	#def load_videos_from_folder(folder):
@@ -83,14 +86,14 @@ def ComputerVision(name,mpq):
 		 #   print("Can't receive frame (stream end?). Exiting ...")
 		  #  break
 		
-		image, image_copy = ApplyFilters(image)
+		image, image_copy, approx = ApplyFilters(image)
 	 
 		
 		if cv2.waitKey(10) == ord('q'):
 			break
 		cv2.imshow("erosion", image)
 		cv2.imshow("frame", image_copy)
-		mpq.put("hello")
+		mpq.put(approx)
 	cap.release()
 	cv2.destroyAllWindows()
 

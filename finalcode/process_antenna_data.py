@@ -101,7 +101,8 @@ def extract_messages(line):
     
     # Find all occurrences of B: or G: followed by data
     import re
-    pattern = r'[BG]:\d+\.?\d*,[^\s,]+,[^\s,]+,\d+'
+  #  pattern = r'[BG]:\d+\.?\d*,[^\s,]+,[^\s,]+,\d+'
+    pattern = r'[BGC]:[^\s]+'
     matches = re.findall(pattern, line)
     
     return matches
