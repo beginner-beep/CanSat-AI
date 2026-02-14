@@ -4,7 +4,6 @@ import time
 from antennaqueue import q
 def bmethread(name):
     
-
     address = 0x76
 
     bus = smbus2.SMBus(1)
@@ -18,11 +17,10 @@ def bmethread(name):
         humidity = data.humidity
         pressure = data.pressure
         unix_timestamp = int(time.time())
-        q.put(f"B:{temperature_celsius:.1f},{humidity:.1f},{pressure:.1f},{unix_timestamp}")
-     #   print(f"Temperature:{temperature_celsius} celsius")
-      #  print(f"humidity:{humidity}")
-       # print(f"pressure:{pressure}")
-       # print(f"timestamp:{timestamp}")
-       # print('-----------------')
+        hours = (unix_timestamp//3600) %24
+        minutes = (unix_timestamp%3600)//60
+        seconds = unix_timestamp % 60
+        time_send = f"{hours:02}:{minutes:02}:{seconds:02}"
+        q.put(f"B:{temperature_celsius:.1f},{humidity:.1f},{pressure:.1f},{time_send}")
         time.sleep(1)
 
