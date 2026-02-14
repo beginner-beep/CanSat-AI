@@ -94,18 +94,21 @@ def process_serial(port, baudrate=9600):
         if ser.is_open:
             ser.close()
 
-
 def extract_messages(line):
-    """Extract compact messages (B:... or G:...) from a line"""
-    messages = []
+    import re
+    return re.findall(r'[BGC]:[^BGC]+', line)
+
+#def extract_messages(line):
+ #   """Extract compact messages (B:... or G:...) from a line"""
+  #  messages = []
     
     # Find all occurrences of B: or G: followed by data
-    import re
+   # import re
   #  pattern = r'[BG]:\d+\.?\d*,[^\s,]+,[^\s,]+,\d+'
-    pattern = r'[BGC]:[^\s]+'
-    matches = re.findall(pattern, line)
+    #pattern = r'[BGC]:[^\s]+'
+    #matches = re.findall(pattern, line)
     
-    return matches
+    #return matches
 
 
 def main():

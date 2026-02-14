@@ -15,7 +15,9 @@ def antennathread(name,mpq):
 	
 	while True:
 		number +=1
-		msg = f"data queue {q.get()}, mp queue: {mpq.get()} "
+		msg = f"{q.get()} "
+		msg1 = f"{mpq.get()}"
 		ser.write(msg.encode())
+		ser.write(msg1.encode())
 		print(msg, end=' ')
 		time.sleep(1)
