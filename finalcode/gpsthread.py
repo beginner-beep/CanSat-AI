@@ -7,6 +7,10 @@ from antennaqueue import q
 def gpsthread(name):
     
     ser=serial.Serial("/dev/ttyAMA3", baudrate=38400, timeout=1)
+    alt = None
+    lat = None
+    lng = None
+    
     while True:
 
         dataout =pynmea2.NMEAStreamReader() 
@@ -14,15 +18,15 @@ def gpsthread(name):
         if b'$GNGGA' in newdata:
             decoded = newdata.decode('utf-8', errors='ignore')
             msg = pynmea2.parse(decoded)
-		
             alt = msg.altitude  # meters
-            q.put(f"altitude: {alt}")
-          #  print(f"Altitude = {alt} meters")
+            
         if b'$GNGLL' in newdata:
-          #  print(newdata.decode('utf-8'))
             newmsg=pynmea2.parse(newdata.decode('utf-8'))  
             lat=newmsg.latitude 
             lng=newmsg.longitude 
-            gps = "Latitude=" + str(lat) + "and Longitude=" +str(lng)
-            q.put(gps)
-           # print(gps)
+            
+            # Send combined GPS data when we have coordinates
+            if alt is not None:
+                unix_timestamp = int(time.time())
+                gps = f"G:{lat:.1f},{lng:.1f},{alt:.1f},{unix_timestamp}"
+                q.put(gps)
