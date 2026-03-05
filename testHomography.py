@@ -36,7 +36,7 @@ def ApplyFilters(image):
     filtered_contours = [c for c in contours if cv2.contourArea(c) > min_area]
     filtered_contours = sorted(filtered_contours, key=cv2.contourArea, reverse=True)
     image_copy = thresh.copy()
-# Keep only the largest N zones (e.g., 3)
+
     contours = filtered_contours[:3]
     
     cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(255, 255, 0), thickness=1, lineType=cv2.LINE_AA)
@@ -52,21 +52,18 @@ def load_videos_from_folder(folder):
 
 scale = 0.5
 
-relative_camera_position = [0,0,0] # start at origin 
+relative_camera_position = [0,0,0] 
   
 videos = load_videos_from_folder("TestVideos")
 cap = videos[1]
 
-# Use ORB or SIFT for keypoints
 feature_detector = cv2.ORB_create(50)
 bf_matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-# read first frame
 ret, prev_frame = cap.read()
 prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
 kp1, des1 = feature_detector.detectAndCompute(prev_gray, None)
 
-# define reference "world" image as the first frame
 H_total = np.eye(3)  # accumulate motion
 DebugCounter=0
 while True:
@@ -77,8 +74,7 @@ while True:
     frame = cv2.resize(frame, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
    
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    # 1. detect and match features
+   
     kp2, des2 = feature_detector.detectAndCompute(gray, None)
     matches = bf_matcher.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
@@ -86,15 +82,13 @@ while True:
     pts1 = np.float32([kp1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
     pts2 = np.float32([kp2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
 
-    # 2. estimate homography between frames
-    H, mask = cv2.findHomography(pts2, pts1, cv2.RANSAC, 5.0)  # note: invert order to warp to ref
+  
+    H, mask = cv2.findHomography(pts2, pts1, cv2.RANSAC, 5.0) 
     if H is None:
         continue
-
-    # 3. accumulate total transformation (optional)
+   
     H_total = H_total @ H
 
-    # 4. warp current frame to align with reference
     h, w = prev_gray.shape
     
     j, zone_pts_ref,contours = ApplyFilters(frame)
@@ -102,14 +96,9 @@ while True:
 
     stabilized = cv2.warpPerspective(gray, H_total, (w, h))
     
-    # 5. transform safe zone polygons (example)
-   # Suppose zone_pts_ref is Nx2 array of points (from detection on ref frame)
-    #Convert to homogeneous coordinates
-    
     zone_pts_ref = np.array(zone_pts_ref, dtype=np.float32).reshape(-1, 1, 2)
     zone_homog = cv2.perspectiveTransform(zone_pts_ref, np.linalg.inv(H_total))
 
-    # visualize
     for pt in zone_homog.reshape(-1,2).astype(int):
         cv2.circle(stabilized, tuple(pt), 5, (0,255,0), -1)
    

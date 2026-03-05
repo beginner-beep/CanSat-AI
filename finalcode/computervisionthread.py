@@ -19,7 +19,7 @@ def ComputerVision(name,mpq):
 
 	lower_green = np.array([0,0, 99])
 	upper_green = np.array([255, 255, 255])
-	##(hMin = 112 , sMin = 0, vMin = 0), (hMax = 179 , sMax = 255, vMax = 255)
+	##(hMin = 112 , sMin = 0, vMin = 0), (hMax = 179 , sMax = 255, vMax = 255) volgens de colour picker script
 	lower_purple = np.array([113,0, 0])
 	upper_purple = np.array([179, 255, 255])
 
@@ -43,7 +43,7 @@ def ComputerVision(name,mpq):
 		contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	   # cv2.imshow("Main", resgreen)
 	   
-		min_area = 500  # ignore tiny noise
+		min_area = 500 
 		filtered_contours = [c for c in contours if cv2.contourArea(c) > min_area]
 		filtered_contours = sorted(filtered_contours, key=cv2.contourArea, reverse=True)
 		image_copy = thresh.copy()

@@ -28,5 +28,5 @@ def gpsthread(name):
             # Send combined GPS data when we have coordinates
             if alt is not None:
                 unix_timestamp = int(time.time())
-                gps = f"G:{lat:.1f},{lng:.1f},{alt:.1f},{unix_timestamp}"
+                gps = f"G:{lat:.5f},{lng:.5f},{alt:.5f},{unix_timestamp}"
                 q.put(gps)
