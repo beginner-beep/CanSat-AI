@@ -21,6 +21,6 @@ def bmethread(name):
         minutes = (unix_timestamp%3600)//60
         seconds = unix_timestamp % 60
         time_send = f"{hours:02}:{minutes:02}:{seconds:02}"
-        q.put(f"B:{temperature_celsius:.1f},{humidity:.1f},{pressure:.1f},{time_send}")
+        q.put(f"B:{temperature_celsius:.1f},{humidity:.1f},{pressure:.1f},{unix_timestamp}")
         time.sleep(1)
 
