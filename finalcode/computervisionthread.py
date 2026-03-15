@@ -9,6 +9,15 @@ import time
 import board
 import busio
 
+
+raw_dir = 0 #aanpassen aan raspi
+processed_dir = 0 #aanpassen aan raspi
+
+os.makedirs(raw_dir, exist_ok=True)
+os.makedirs(processed_dir, exist_ok=True)
+
+frame_id=0
+
 def ComputerVision(name,mpq):
 	picam2= Picamera2()
 	config = picam2.create_preview_configuration(
@@ -49,6 +58,8 @@ def ComputerVision(name,mpq):
 		image_copy = thresh.copy()
 		#keeping only 1, if i want to use more for local possible but this is better for transmitting
 		contours = filtered_contours[:1]
+		if len(contours) == 0:
+			return image, thresh, None
 		epsilon = 0.01 * cv2.arcLength(contours[0], True)  # tuning parameter
 		approx = cv2.approxPolyDP(contours[0], epsilon, True)
 		
@@ -87,14 +98,25 @@ def ComputerVision(name,mpq):
 		
 		image, image_copy, approx = ApplyFilters(image)
 
-		elapsed = time.time()
+		
+		elapsed = time.time() - start
 		time.sleep(max(0, 1.0 - elapsed))
+		raw_path = f"{raw_dir}/raw_{frame_id:06d}.jpg"
+		proc_path = f"{processed_dir}/proc_{frame_id:06d}.jpg"
+		cv2.imwrite(raw_path, image)
+		cv2.imwrite(proc_path, image_copy)
+
+		if approx is not None:
+			mpq.put(approx)
+
+		frame_id += 1
   
 		if cv2.waitKey(10) == ord('q'):
 			break
+		#uiteindelijk weghalen vanwege overheid en niet nodig
 		cv2.imshow("erosion", image)
 		cv2.imshow("frame", image_copy)
-		mpq.put(approx)
+		
 	cap.release()
 	cv2.destroyAllWindows()
 
