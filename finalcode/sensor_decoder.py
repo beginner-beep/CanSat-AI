@@ -76,11 +76,11 @@ class SensorDecoder:
         Example contour message:
         C:x1,y1,x2,y2,...
         """
-        parts = data_str.split(',')
+        parts = [p for p in data_str.split(',') if p]  # Filter out empty strings
         coords = list(map(int, parts))
 
         if len(coords) % 2 != 0:
-            raise ValueError(f"Contour data should have even number of coordinates, got {len(coords)}")
+            coords = coords[:-1]  # Remove last incomplete coordinate if odd
 
         points = []
         for i in range(0, len(coords), 2):
@@ -134,7 +134,7 @@ def format_data(decoded_data):
                 f"Lon={decoded_data['longitude']}°, "
                 f"Alt={decoded_data['altitude_m']}m")
     elif msg_type == 'CONTOUR':
-     return f"[CONTOUR] {len(decoded_data['points'])} points"
+     return f"[CONTOUR] Points: {decoded_data['points']}"
 
     
     return "Unknown data type"
