@@ -41,5 +41,5 @@ def main():
     data_process.join()
     
 if __name__ == "__main__":
-   # mp.set_start_method("spawn")  # REQUIRED on Raspberry Pi
+ 
     main()
