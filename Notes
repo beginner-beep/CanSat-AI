@@ -1,4 +1,0 @@
-for camera setup:
-raspi/firmware/config 
-commented out auto detect
-added dtoverlay with camera code
