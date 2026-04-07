@@ -1,38 +1,17 @@
-"""
-Decoder script for compact sensor data transmitted via LoRa
-Parses BME and GPS messages received from the antenna
-
-Message formats:
-- BME: B:temperature,humidity,pressure,unix_timestamp
-- GPS: G:latitude,longitude,altitude,unix_timestamp
-
-Example:
-- B:23.5,45.1,1013.2,1739567445
-- G:40.7,-74.0,324.5,1739567445
-"""
 
 from datetime import datetime
 
-
 class SensorDecoder:
-    """Decode compact sensor messages from LoRa transmission"""
+
     
     @staticmethod
     def decode_message(message):
-        """
-        Decode a sensor message and return structured data
-        
-        Args:
-            message (str): Raw message string from antenna
-            
-        Returns:
-            dict: Decoded sensor data with type and values
-        """
+
         if not message or len(message) < 2:
             return None
         
         message_type = message[0]
-        data_str = message[2:]  # Skip "X:" prefix
+        data_str = message[2:] 
         
         try:
             if message_type == 'B':
@@ -72,15 +51,11 @@ class SensorDecoder:
         }
     @staticmethod
     def _decode_contour(data_str):
-        """
-        Example contour message:
-        C:x1,y1,x2,y2,...
-        """
-        parts = [p for p in data_str.split(',') if p]  # Filter out empty strings
+        parts = [p for p in data_str.split(',') if p] 
         coords = list(map(int, parts))
 
         if len(coords) % 2 != 0:
-            coords = coords[:-1]  # Remove last incomplete coordinate if odd
+            coords = coords[:-1]
 
         points = []
         for i in range(0, len(coords), 2):
@@ -139,8 +114,6 @@ def format_data(decoded_data):
     
     return "Unknown data type"
 
-
-# Example usage
 if __name__ == "__main__":
     test_messages = [
         "B:23.5,45.1,1013.2,1739567445",
