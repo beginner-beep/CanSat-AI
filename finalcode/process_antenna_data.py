@@ -1,8 +1,7 @@
 """
 Process sensor data received from antenna via PuTTY or live serial connection
 Decodes compact messages and outputs human-readable format
-
-Usage:
+how to use:
     From PuTTY log file:
         python process_antenna_data.py --file putty_log.txt
     
@@ -18,7 +17,6 @@ from sensor_decoder import SensorDecoder, format_data
 
 
 def process_log_file(filepath):
-    """Process a PuTTY log file and decode all sensor messages"""
     print(f"Processing log file: {filepath}\n")
     
     decoder = SensorDecoder()
@@ -29,11 +27,9 @@ def process_log_file(filepath):
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 
-                # Skip empty lines only
                 if not line or line.startswith('['):
                     continue
                 
-                # Extract potential message (look for B: or G: pattern)
                 messages = extract_messages(line)
                 if messages:
                     for msg in messages:
@@ -43,7 +39,6 @@ def process_log_file(filepath):
                             message_count[msg_type] = message_count.get(msg_type, 0) + 1
                             print(f"Line {line_num}: {format_data(decoded)}")
                 else:
-                    # Print raw line if no sensor messages found
                     print(f"Line {line_num}: {line}")
         
         print(f"\n--- Summary ---")
@@ -70,7 +65,6 @@ def process_serial(port, baudrate=9600):
                 data = ser.readline().decode('utf-8', errors='ignore').strip()
                 
                 if data:
-                    # Extract messages from the line
                     messages = extract_messages(data)
                     if messages:
                         for msg in messages:
@@ -78,7 +72,6 @@ def process_serial(port, baudrate=9600):
                             if decoded:
                                 print(format_data(decoded))
                     else:
-                        # Print raw line if no sensor messages found
                         print(data)
             
             except KeyboardInterrupt:
@@ -97,19 +90,6 @@ def process_serial(port, baudrate=9600):
 def extract_messages(line):
     import re
     return re.findall(r'[BGC]:[^BGC]+', line)
-
-#def extract_messages(line):
- #   """Extract compact messages (B:... or G:...) from a line"""
-  #  messages = []
-    
-    # Find all occurrences of B: or G: followed by data
-   # import re
-  #  pattern = r'[BG]:\d+\.?\d*,[^\s,]+,[^\s,]+,\d+'
-    #pattern = r'[BGC]:[^\s]+'
-    #matches = re.findall(pattern, line)
-    
-    #return matches
-
 
 def main():
     parser = argparse.ArgumentParser(
