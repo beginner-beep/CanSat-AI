@@ -26,17 +26,12 @@ def manager(name, mpq):
 
     try:
         while True:
-            # keep main thread alive
             time.sleep(1)
     except KeyboardInterrupt:
         stop_event.set()
 
 
 def ComputerVisionVideo(name, mpq, video_folder="TestVideos"):
-    """Computer vision process that reads frames from videos in `video_folder` instead of a live camera.
-    Applies the same filters as the original camera-based ComputerVision function and pushes a message to `mpq`.
-    """
-
     # HSV filter ranges (copied from original)
     lower_green = np.array([0, 0, 99])
     upper_green = np.array([255, 255, 255])
@@ -74,7 +69,6 @@ def ComputerVisionVideo(name, mpq, video_folder="TestVideos"):
         image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
         return image, image_copy
 
-    # Load videos
     video_paths = []
     folder_path = os.path.join(os.getcwd(), video_folder)
     if not os.path.isdir(folder_path):
@@ -83,10 +77,10 @@ def ComputerVisionVideo(name, mpq, video_folder="TestVideos"):
 
     for fname in sorted(os.listdir(folder_path)):
         path = os.path.join(folder_path, fname)
-        # skip non-files (and hidden files)
+    
         if not os.path.isfile(path) or fname.startswith("."):
             continue
-        # basic file-type check
+    
         if not (fname.lower().endswith(('.mp4', '.avi', '.mov', '.mkv'))):
             continue
         video_paths.append(path)
@@ -95,7 +89,6 @@ def ComputerVisionVideo(name, mpq, video_folder="TestVideos"):
         print(f"No video files found in {folder_path}")
         return
 
-    # iterate through videos indefinitely
     vid_index = 0
     try:
         while True:
@@ -105,20 +98,16 @@ def ComputerVisionVideo(name, mpq, video_folder="TestVideos"):
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
-                    # end of this video
                     break
 
                 image, image_copy = ApplyFilters(frame)
 
-                # display (useful while testing)
                 cv2.imshow('frame', image_copy)
                 cv2.imshow('erosion', image)
 
-                # push a simple message into the queue to mimic the original behaviour
                 try:
                     mpq.put_nowait("hello")
                 except Exception:
-                    # avoid blocking if queue full or closed
                     pass
 
                 if cv2.waitKey(10) == ord('q'):
