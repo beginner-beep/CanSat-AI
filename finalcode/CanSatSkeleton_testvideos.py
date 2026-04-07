@@ -9,7 +9,7 @@ from bmethread import bmethread
 from antennathread import antennathread
 from processqueue import mpq
 
-
+#used for presentations as this script shows example screenrecordings we got from google maps
 def manager(name, mpq):
     print(f"[{name}] Starting")
 
