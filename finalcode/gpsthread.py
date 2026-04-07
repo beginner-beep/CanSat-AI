@@ -18,14 +18,13 @@ def gpsthread(name):
         if b'$GNGGA' in newdata:
             decoded = newdata.decode('utf-8', errors='ignore')
             msg = pynmea2.parse(decoded)
-            alt = msg.altitude  # meters
+            alt = msg.altitude 
             
         if b'$GNGLL' in newdata:
             newmsg=pynmea2.parse(newdata.decode('utf-8'))  
             lat=newmsg.latitude 
             lng=newmsg.longitude 
             
-            # Send combined GPS data when we have coordinates
             if alt is not None:
                 unix_timestamp = int(time.time())
                 gps = f"G:{lat:.5f},{lng:.5f},{alt:.5f},{unix_timestamp}"
