@@ -70,31 +70,12 @@ def ComputerVision(name,mpq):
 		image_copy = cv2.resize(image_copy, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
 		image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
 		return image, image_copy, approx
-		
-	   
-	#def load_videos_from_folder(folder):
-	 #   videos = []
-	#  for filename in os.listdir(folder):
-	  #      vid = cv2.VideoCapture(os.path.join(folder,filename))
-	   #     if vid is not None:
-		#        videos.append(vid)
-		#return videos
-
-	#videos = load_videos_from_folder("TestVideos")
-
-	#cap = videos[1]
-
-	##colour filters: select values with colour v
-
+	
 	while True:
 		start = time.time()
            
 		image = picam2.capture_array()
 		cv2.imshow('test', image)
-		# if frame is read correctly ret is True
-		#if not image:
-		 #   print("Can't receive frame (stream end?). Exiting ...")
-		  #  break
 		
 		image, image_copy, approx = ApplyFilters(image)
 
@@ -113,10 +94,7 @@ def ComputerVision(name,mpq):
   
 		if cv2.waitKey(10) == ord('q'):
 			break
-		#uiteindelijk weghalen vanwege overheid en niet nodig
-		cv2.imshow("erosion", image)
-		cv2.imshow("frame", image_copy)
-		
+
 	cap.release()
 	cv2.destroyAllWindows()
 
